@@ -1,14 +1,13 @@
-import os
-os.system("pip install joblib")
-
 import joblib
-
 import streamlit as st
-import joblib
 import numpy as np
 
-# Load trained model
-model = joblib.load("salary_model.pkl")
+# Load trained model safely
+try:
+    model = joblib.load("salary_model.pkl")
+except Exception as e:
+    st.error("Error loading model. Make sure 'salary_model.pkl' is in your repository.")
+    st.stop()
 
 # Streamlit UI
 st.title("💼 Salary Prediction App")
@@ -19,5 +18,8 @@ years_of_experience = st.number_input("Years of Experience", min_value=0.0, max_
 
 # Predict button
 if st.button("Predict Salary"):
-    prediction = model.predict(np.array([[years_of_experience]]))[0]
-    st.success(f"Predicted Salary: ${prediction:.2f}")
+    try:
+        prediction = model.predict(np.array([[years_of_experience]]))[0]
+        st.success(f"Predicted Salary: ${prediction:.2f}")
+    except Exception as e:
+        st.error(f"Prediction failed: {e}")
